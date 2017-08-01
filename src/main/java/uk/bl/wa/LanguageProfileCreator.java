@@ -5,8 +5,9 @@ package uk.bl.wa;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import com.optimaize.langdetect.i18n.LdLocale;
 import com.optimaize.langdetect.ngram.NgramExtractors;
@@ -34,21 +35,27 @@ public class LanguageProfileCreator {
 
         // load your training text:
         TextObject inputText = textObjectFactory.create();
+        long count = 0;
         // Scan files...
         for (File f : new File("profile-input").listFiles()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            System.out.println("Reading " + f.getName());
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     inputText.append(line);
+                    System.out.println(f.getName() + ": " + line);
+                    count += 1;
                 }
             }
         }
+        System.out.println("Read " + count + " lines.");
 
         // create the profile:
         LanguageProfile languageProfile = new LanguageProfileBuilder(
                 LdLocale.fromString("gd"))
                         .ngramExtractor(NgramExtractors.standard())
-                        .minimalFrequency(2) // adjust to tune profile size to
+                        .minimalFrequency(3) // adjust to tune profile size to
                                              // around 30KB
                         .addText(inputText).build();
 
