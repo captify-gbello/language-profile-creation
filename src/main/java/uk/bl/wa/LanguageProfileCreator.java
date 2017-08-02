@@ -75,6 +75,9 @@ public class LanguageProfileCreator {
                     new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
                 String line;
                 while ((line = br.readLine()) != null) {
+                    if( line.startsWith("[")) {
+                        continue;
+                    }
                     inputText.append(line);
                     System.out.println(f.getName() + ": " + line);
                     count += 1;
@@ -83,15 +86,15 @@ public class LanguageProfileCreator {
         }
         System.out.println("Read " + count + " lines.");
         for (File f : new File("profile-input/gdwiki-json/AA").listFiles()) {
-            System.out.println("Reading " + f.getName());
-            parseWikipediaJsonFile(inputText, f.getAbsolutePath());
+            // System.out.println("Reading " + f.getName());
+            // parseWikipediaJsonFile(inputText, f.getAbsolutePath());
         }
 
         // create the profile:
         LanguageProfile languageProfile = new LanguageProfileBuilder(
                 LdLocale.fromString("gd"))
                         .ngramExtractor(NgramExtractors.standard())
-                        .minimalFrequency(500) // adjust to tune profile size to
+                        .minimalFrequency(50) // adjust to tune profile size to
                                              // around 30KB
                         .addText(inputText).build();
 
